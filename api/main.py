@@ -15,7 +15,14 @@ import os
 import io
 import logging
 from typing import Optional
+
 load_dotenv()
+
+# ── Resolve paths relative to this file so deployments work from any cwd ──────
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR    = os.path.join(BASE_DIR, "static")
+TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
+
 # ── Optional heavy parsers (install if available) ─────────────────────────────
 try:
     import pdfplumber
@@ -48,7 +55,7 @@ app.add_middleware(
 )
 
 # Serve static files and templates
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 #HF_API_BASE = "https://api-inference.huggingface.co/models"
 HF_API_BASE = "https://router.huggingface.co/hf-inference/models"
@@ -163,7 +170,7 @@ def format_output(text: str, fmt: str) -> str:
 
 @app.get("/")
 async def index():
-    return FileResponse("templates/index.html")
+    return FileResponse(os.path.join(TEMPLATES_DIR, "index.html"))
 
 
 @app.get("/api/models")
@@ -333,6 +340,8 @@ async def call_hf(model: str, text: str, min_len: int, max_len: int):
             detail=f"Unexpected HuggingFace response: {data}"
         )
 
+    except HTTPException:
+        raise  # don't swallow intentional HTTP errors
     except Exception as e:
         raise HTTPException(
             status_code=500,
