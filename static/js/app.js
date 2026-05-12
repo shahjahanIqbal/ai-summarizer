@@ -280,13 +280,7 @@ async function callHuggingFace({ text, model, tone, outputFormat, condenseBy, co
 
   // Direct HF inference (frontend-only / standalone HTML)
   const lengths = computeLengths(text, condenseBy, condenseValue);
-  const resp = await fetch("/api/summarize/text", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload)
-})//fetch(`https://api-inference.huggingface.co/models/${model}`, {
+  const resp = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
