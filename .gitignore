@@ -2,3 +2,4 @@ docSum/
 .env
 __pycache__/
 testdoc.txt
+*.pyc
