@@ -288,8 +288,14 @@ async function callHuggingFace({ text, model, tone, outputFormat, condenseBy, co
 
 
   if (!resp.ok) {
-  const errText = await resp.text();
-  throw new Error(errText || `HTTP ${resp.status}`);
+  let msg = `HTTP ${resp.status}`;
+  try {
+    const errJson = await resp.json();
+    msg = errJson.detail || JSON.stringify(errJson);
+  } catch {
+    msg = await resp.text() || msg;
+  }
+  throw new Error(msg);
 }
 
 const data = await resp.json();
