@@ -18,12 +18,15 @@ from typing import Optional
 
 load_dotenv()
 
-#
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# ── Resolve paths relative to the project root (one level up from api/) ───────
+# main.py lives at  <project>/api/main.py
+# static/ and templates/ live at  <project>/static/  and  <project>/templates/
+API_DIR       = os.path.dirname(os.path.abspath(__file__))  # .../api/
+BASE_DIR      = os.path.dirname(API_DIR)                    # .../ (project root)
 STATIC_DIR    = os.path.join(BASE_DIR, "static")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 
-#  Optional heavy parsers (install if available) 
+# ── Optional heavy parsers (install if available) ─────────────────────────────
 try:
     import pdfplumber
     HAS_PDF = True
@@ -81,7 +84,7 @@ TONE_KEYWORDS = {
 }
 
 
-# Helpers 
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
 def detect_tone(text: str) -> str:
     lower = text.lower()
@@ -166,7 +169,7 @@ def format_output(text: str, fmt: str) -> str:
     return text.strip()
 
 
-#  Routes 
+# ── Routes ────────────────────────────────────────────────────────────────────
 
 @app.get("/")
 async def index():
