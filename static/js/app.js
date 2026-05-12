@@ -267,34 +267,31 @@ async function summarize() {
 
 /* ── HuggingFace API call ───────────────────────────────────────────────────── */
 async function callHuggingFace({ text, model, tone, outputFormat, condenseBy, condenseValue }) {
-  // Try backend first (if running locally)
-  const useBackend = window.location.hostname !== '' && !window.location.protocol.startsWith('file');
 
-  if (useBackend && window.location.port) {
-    // Server-side route
-    const body = JSON.stringify({ text, model, tone, output_format: outputFormat, condense_by: condenseBy, condense_value: condenseValue });
-    const res  = await fetch('/api/summarize/text', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
-    if (!res.ok) { const d = await res.json(); throw new Error(d.detail || `HTTP ${res.status}`); }
-    return res.json();
-  }
+  const body = JSON.stringify({
+    text,
+    model,
+    tone,
+    output_format: outputFormat,
+    condense_by: condenseBy,
+    condense_value: condenseValue
+  });
 
-  // Direct HF inference (frontend-only / standalone HTML)
-  const lengths = computeLengths(text, condenseBy, condenseValue);
   const resp = await fetch("/api/summarize/text", {
     method: "POST",
     headers: {
-        "Content-Type": "application/json"
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify(payload)
-})//fetch(`https://api-inference.huggingface.co/models/${model}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      inputs: text.slice(0, 3500),
-      parameters: { min_length: lengths.min, max_length: lengths.max, do_sample: false, truncation: true },
-      options: { wait_for_model: true },
-    }),
+    body
   });
+
+  if (!resp.ok) {
+    const errData = await resp.json().catch(() => ({}));
+    throw new Error(errData.detail || `HTTP ${resp.status}`);
+  }
+
+  return await resp.json();
+}
 
   if (!resp.ok) {
     const errData = await resp.json().catch(() => ({}));
