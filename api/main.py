@@ -18,12 +18,12 @@ from typing import Optional
 
 load_dotenv()
 
-# ── Resolve paths relative to this file so deployments work from any cwd ──────
+#
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR    = os.path.join(BASE_DIR, "static")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 
-# ── Optional heavy parsers (install if available) ─────────────────────────────
+#  Optional heavy parsers (install if available) 
 try:
     import pdfplumber
     HAS_PDF = True
@@ -81,7 +81,7 @@ TONE_KEYWORDS = {
 }
 
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# Helpers 
 
 def detect_tone(text: str) -> str:
     lower = text.lower()
@@ -166,7 +166,7 @@ def format_output(text: str, fmt: str) -> str:
     return text.strip()
 
 
-# ── Routes ────────────────────────────────────────────────────────────────────
+#  Routes 
 
 @app.get("/")
 async def index():
