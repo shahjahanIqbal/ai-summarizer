@@ -287,8 +287,13 @@ async function callHuggingFace({ text, model, tone, outputFormat, condenseBy, co
 
 
 
-  const data = await resp.json();
-  
+  if (!resp.ok) {
+  const errText = await resp.text();
+  throw new Error(errText || `HTTP ${resp.status}`);
+}
+
+const data = await resp.json();
+
   return {
     summary: data.summary || "No summary returned.",
     tone: data.tone || (tone === 'auto' ? detectTone(text) : tone),
