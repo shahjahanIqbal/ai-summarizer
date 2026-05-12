@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Text Summarizer</title>
+  <meta name="description" content="Summarize any text using HuggingFace Transformers. Supports TXT, MD, LaTeX, HTML, DOCX, PDF and more.">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <!-- JSZip for .docx export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+</head>
+<body>
+
+<main class="app-shell" role="main">
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="brand-icon" aria-hidden="true">
+        <!-- Sparkle / summarize icon -->
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3v3M12 18v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M3 12h3M18 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+          <circle cx="12" cy="12" r="4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">AI Text Summarizer</div>
+        <div class="brand-sub">Powered by HuggingFace Transformers</div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle colour theme" title="Toggle light / dark">
+        <!-- Moon icon (shown in light mode) -->
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+        </svg>
+        <!-- Sun icon (shown in dark mode) -->
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Workspace grid ──────────────────────────────────────────────────── -->
+  <div class="workspace">
+
+    <!-- LEFT: Input + Output -->
+    <div class="left-col">
+
+      <!-- Input panel -->
+      <div class="panel">
+        <div class="panel-head">
+          <span class="panel-label">Input</span>
+          <span id="wc-file" style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);display:none"></span>
+        </div>
+        <div class="panel-body">
+
+          <!-- Tabs -->
+          <div class="tabs" role="tablist">
+            <button id="tab-text" class="tab tab--active" role="tab" aria-selected="true" onclick="switchTab('text')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              Paste Text
+            </button>
+            <button id="tab-file" class="tab" role="tab" aria-selected="false" onclick="switchTab('file')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Upload File
+            </button>
+          </div>
+
+          <!-- Pane: paste text -->
+          <div id="pane-text">
+            <textarea
+              id="text-input"
+              placeholder="Paste your text here — articles, essays, reports, LaTeX equations, Markdown, HTML…"
+              oninput="onTextInput()"
+              aria-label="Text to summarise"
+            ></textarea>
+            <div class="wc-bar">
+              <span class="wc-chip" id="wc-words">0w</span>
+              <span class="wc-chip" id="wc-chars">0c</span>
+              <span class="wc-chip" id="wc-paras">0¶</span>
+            </div>
+          </div>
+
+          <!-- Pane: file upload -->
+          <div id="pane-file" style="display:none">
+            <div
+              id="drop-zone"
+              class="drop-zone"
+              onclick="document.getElementById('file-input').click()"
+              ondragover="onDragOver(event)"
+              ondragleave="onDragLeave()"
+              ondrop="onDrop(event)"
+              role="button"
+              tabindex="0"
+              aria-label="Upload a file"
+            >
+              <svg class="dz-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <p>Click or drag &amp; drop a file here</p>
+              <small>TXT · MD · LaTeX · HTML · RTF · RST · ORG · DOCX · PDF</small>
+
+              <div id="file-badge" class="file-badge" style="display:none">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span class="badge-name"></span>
+              </div>
+            </div>
+
+            <input
+              type="file"
+              id="file-input"
+              accept=".txt,.md,.tex,.latex,.html,.htm,.rtf,.rst,.org,.docx,.pdf,.csv"
+              onchange="onFileSelect(event)"
+              style="display:none"
+              aria-hidden="true"
+            >
+
+            <div class="format-tags" style="margin-top:10px">
+              <span class="fmt-tag">TXT</span>
+              <span class="fmt-tag">MD</span>
+              <span class="fmt-tag">LaTeX</span>
+              <span class="fmt-tag">HTML</span>
+              <span class="fmt-tag">RTF</span>
+              <span class="fmt-tag">RST</span>
+              <span class="fmt-tag">ORG</span>
+              <span class="fmt-tag">DOCX</span>
+              <span class="fmt-tag">PDF</span>
+              <span class="fmt-tag">CSV</span>
+            </div>
+
+            <div class="wc-bar" style="margin-top:8px">
+              <span id="wc-file" style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono)">No file loaded</span>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /input panel -->
+
+      <!-- Output panel -->
+      <div class="panel output-wrap">
+        <div class="panel-head">
+          <span class="panel-label">Summary Output</span>
+          <div id="tone-badge"></div>
+        </div>
+        <div class="panel-body">
+
+          <!-- Placeholder -->
+          <div class="output-empty" id="output-placeholder">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <p>Your summary will appear here</p>
+          </div>
+
+          <!-- Loading -->
+          <div class="loading-state" id="output-loading" style="display:none" aria-live="polite" aria-busy="true">
+            <div class="loading-row">
+              <span class="spinner" role="status" aria-label="Loading"></span>
+              <span id="loading-msg">Connecting to HuggingFace…</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+          </div>
+
+          <!-- Result -->
+          <div id="output-result" style="display:none">
+            <div class="stats-row" id="stats-row"></div>
+            <div class="output-text" id="output-text" aria-live="polite"></div>
+
+            <div class="download-bar">
+              <button class="btn btn-sm" onclick="downloadAs('txt')" title="Download as plain text">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                .txt
+              </button>
+              <button class="btn btn-sm" onclick="downloadAs('md')" title="Download as Markdown">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                .md
+              </button>
+              <button class="btn btn-sm" onclick="downloadAs('html')" title="Download as HTML">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                .html
+              </button>
+              <button class="btn btn-sm" onclick="downloadAs('pdf')" title="Print / save as PDF">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                .pdf
+              </button>
+              <button class="btn btn-sm" onclick="downloadAs('docx')" title="Download as Word document">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                .docx
+              </button>
+              <button class="btn btn-sm" onclick="copySummary()" title="Copy to clipboard">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+            </div>
+          </div>
+
+          <!-- Alert -->
+          <div class="alert" id="alert-box" style="display:none" role="alert">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span class="alert-msg"></span>
+          </div>
+
+        </div>
+      </div><!-- /output panel -->
+
+    </div><!-- /left-col -->
+
+    <!-- RIGHT: Settings sidebar -->
+    <aside class="right-col" aria-label="Summarization settings">
+
+      <div class="panel">
+        <div class="panel-head"><span class="panel-label">Settings</span></div>
+        <div class="panel-body">
+          <div class="settings-grid">
+
+            <!-- Model -->
+            <div class="field">
+              <label class="field-label" for="model-select">AI Model</label>
+              <select id="model-select" onchange="onModelChange()">
+                <option value="facebook/bart-large-cnn">BART-large-CNN — Best quality</option>
+                <option value="sshleifer/distilbart-cnn-12-6">DistilBART — Fast</option>
+                <option value="google/pegasus-xsum">PEGASUS-XSum — Extreme compress</option>
+                <option value="philschmid/bart-large-cnn-samsum">BART-SAMSum — Dialogue</option>
+                <option value="pszemraj/long-t5-tglobal-base-16384-book-summary">Long-T5 — Long docs</option>
+              </select>
+              <span class="model-note" id="model-note">Best general-purpose. News, articles, reports.</span>
+            </div>
+
+            <hr class="settings-divider">
+
+            <!-- Tone -->
+            <div class="field">
+              <label class="field-label" for="tone-select">Tone</label>
+              <select id="tone-select">
+                <option value="auto">Auto-detect</option>
+                <option value="formal">Formal</option>
+                <option value="informal">Informal / Casual</option>
+                <option value="academic">Academic</option>
+                <option value="technical">Technical</option>
+                <option value="neutral">Neutral</option>
+                <option value="creative">Creative</option>
+              </select>
+            </div>
+
+            <!-- Output format -->
+            <div class="field">
+              <label class="field-label" for="format-select">Output Format</label>
+              <select id="format-select">
+                <option value="paragraphs">Paragraphs</option>
+                <option value="bullets">Bullet Points</option>
+              </select>
+            </div>
+
+            <hr class="settings-divider">
+
+            <!-- Condensation -->
+            <div>
+              <p class="settings-section-title">Condensation Target</p>
+
+              <div class="field" style="margin-bottom:12px">
+                <label class="field-label" for="condense-by">Measure by</label>
+                <select id="condense-by" onchange="onCondenseByChange()">
+                  <option value="ratio">Compression Ratio (%)</option>
+                  <option value="words">Target Word Count</option>
+                  <option value="chars">Target Character Count</option>
+                  <option value="paragraphs">Target Paragraph Count</option>
+                </select>
+              </div>
+
+              <!-- Ratio -->
+              <div id="condense-ratio" class="field">
+                <label class="field-label">Keep <span id="ratio-label">30</span>% of original</label>
+                <div class="range-row">
+                  <input
+                    type="range" id="ratio-range"
+                    min="10" max="80" value="30" step="5"
+                    aria-label="Compression ratio"
+                    oninput="document.getElementById('ratio-label').textContent=this.value;document.getElementById('ratio-out').textContent=this.value+'%'"
+                  >
+                  <span class="range-out" id="ratio-out">30%</span>
+                </div>
+              </div>
+
+              <!-- Words -->
+              <div id="condense-words" class="field" style="display:none">
+                <label class="field-label" for="target-words">Target word count</label>
+                <input type="number" id="target-words" min="20" max="2000" value="150" placeholder="e.g. 150">
+              </div>
+
+              <!-- Chars -->
+              <div id="condense-chars" class="field" style="display:none">
+                <label class="field-label" for="target-chars">Target character count</label>
+                <input type="number" id="target-chars" min="50" max="10000" value="600" placeholder="e.g. 600">
+              </div>
+
+              <!-- Paragraphs -->
+              <div id="condense-paragraphs" class="field" style="display:none">
+                <label class="field-label" for="target-paras">Target paragraph count</label>
+                <input type="number" id="target-paras" min="1" max="20" value="3" placeholder="e.g. 3">
+              </div>
+
+            </div><!-- /condensation -->
+
+          </div><!-- /settings-grid -->
+        </div>
+      </div>
+
+      <button id="summarize-btn" class="btn btn-primary" onclick="summarize()" aria-label="Summarise">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" style="width:16px;height:16px"><path d="M12 3v3M12 18v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M3 12h3M18 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/><circle cx="12" cy="12" r="4"/></svg>
+        Summarize
+      </button>
+
+    </aside><!-- /right-col -->
+
+  </div><!-- /workspace -->
+
+</main>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>
