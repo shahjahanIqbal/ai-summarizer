@@ -285,34 +285,6 @@ async function callHuggingFace({ text, model, tone, outputFormat, condenseBy, co
     body
   });
 
-  if (!resp.ok) {
-    const errData = await resp.json().catch(() => ({}));
-    throw new Error(errData.detail || `HTTP ${resp.status}`);
-  }
-
-  return await resp.json();
-}
-
-  if (!resp.ok) {
-    const errData = await resp.json().catch(() => ({}));
-    throw new Error(errData.error || `HuggingFace returned HTTP ${resp.status}`);
-  }
-
-  const data = await resp.json();
-  let summaryText = '';
-  if (Array.isArray(data) && data[0]?.summary_text) summaryText = data[0].summary_text;
-  else if (typeof data === 'string') summaryText = data;
-  else summaryText = JSON.stringify(data);
-
-  const formatted = formatSummary(summaryText, outputFormat);
-  const detectedTone = tone === 'auto' ? detectTone(text) : tone;
-
-  return {
-    summary: formatted,
-    tone: detectedTone,
-    stats: computeLocalStats(text, formatted),
-  };
-}
 
 function computeLengths(text, by, value) {
   const words = text.trim().split(/\s+/).length;
