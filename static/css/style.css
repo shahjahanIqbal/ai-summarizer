@@ -1,16 +1,10 @@
-/* ═══════════════════════════════════════════════════════════════════════════
-   AI Text Summarizer — Design System
-   Font: DM Sans (body) + Instrument Serif (accent) + JetBrains Mono (code)
-   Aesthetic: Editorial-technical. Crisp white light / Deep charcoal dark.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
 
-/* ── Reset ─────────────────────────────────────────────────────────────────── */
+/*  Reset  */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; scroll-behavior: smooth; }
 
-/* ── Tokens ─────────────────────────────────────────────────────────────────── */
+/*  Tokens  */
 :root {
   /* Light palette */
   --bg-page:        #F5F3EE;
@@ -63,7 +57,7 @@ html { font-size: 16px; scroll-behavior: smooth; }
   --transition-slow:320ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── Dark theme ─────────────────────────────────────────────────────────────── */
+/*  Dark theme  */
 [data-theme="dark"] {
   --bg-page:        #111210;
   --bg-surface:     #1C1D1A;
@@ -102,7 +96,7 @@ html { font-size: 16px; scroll-behavior: smooth; }
   --shadow-md:      0 4px 16px rgba(0,0,0,0.4);
 }
 
-/* ── Base ───────────────────────────────────────────────────────────────────── */
+/*  Base  */
 body {
   font-family: var(--font-body);
   background: var(--bg-page);
@@ -124,7 +118,7 @@ body::before {
   background-size: 180px;
 }
 
-/* ── Layout ─────────────────────────────────────────────────────────────────── */
+/*  Layout  */
 .app-shell {
   position: relative;
   z-index: 1;
@@ -133,7 +127,7 @@ body::before {
   padding: 0 1.25rem 4rem;
 }
 
-/* ── Header ─────────────────────────────────────────────────────────────────── */
+/*  Header  */
 .header {
   display: flex;
   align-items: center;
@@ -182,7 +176,7 @@ body::before {
 [data-theme="dark"] .theme-toggle .icon-sun  { display: block; }
 [data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 
-/* ── Two-column grid ─────────────────────────────────────────────────────────── */
+/*  Two-column grid  */
 .workspace {
   display: grid;
   grid-template-columns: 1fr 360px;
@@ -191,7 +185,7 @@ body::before {
 }
 @media (max-width: 820px) { .workspace { grid-template-columns: 1fr; } }
 
-/* ── Panel / Card ───────────────────────────────────────────────────────────── */
+/*  Panel / Card  */
 .panel {
   background: var(--bg-surface);
   border: 1px solid var(--border);
@@ -213,7 +207,7 @@ body::before {
 .panel-body { padding: 16px; }
 .panel + .panel { margin-top: 1rem; }
 
-/* ── Tab bar ────────────────────────────────────────────────────────────────── */
+/*  Tab bar  */
 .tabs {
   display: flex; gap: 3px;
   background: var(--bg-hover);
@@ -239,7 +233,7 @@ body::before {
 }
 .tab svg { width: 14px; height: 14px; flex-shrink: 0; }
 
-/* ── Textarea ───────────────────────────────────────────────────────────────── */
+/*  Textarea  */
 textarea {
   width: 100%; resize: vertical;
   border: 1px solid var(--border);
@@ -266,7 +260,7 @@ textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3
   padding: 2px 8px; border-radius: var(--radius-pill);
 }
 
-/* ── Drop zone ──────────────────────────────────────────────────────────────── */
+/*  Drop zone  */
 .drop-zone {
   border: 1.5px dashed var(--border-strong);
   border-radius: var(--radius-md);
@@ -315,7 +309,7 @@ textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3
   letter-spacing: 0.3px;
 }
 
-/* ── Select / Input ─────────────────────────────────────────────────────────── */
+/*  Select / Input  */
 select, input[type="number"], input[type="text"] {
   width: 100%; padding: 8px 11px;
   border: 1px solid var(--border);
@@ -335,7 +329,7 @@ select:focus, input[type="number"]:focus, input[type="text"]:focus {
   outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim);
 }
 
-/* ── Range slider ───────────────────────────────────────────────────────────── */
+/*  Range slider  */
 .range-row { display: flex; align-items: center; gap: 10px; }
 .range-row input[type="range"] { flex: 1; accent-color: var(--accent); }
 .range-out {
@@ -343,7 +337,7 @@ select:focus, input[type="number"]:focus, input[type="text"]:focus {
   color: var(--accent); min-width: 40px; text-align: right;
 }
 
-/* ── Field label ────────────────────────────────────────────────────────────── */
+/*  Field label  */
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field-label {
   font-size: 10.5px; font-weight: 500; letter-spacing: 0.6px;
@@ -351,7 +345,7 @@ select:focus, input[type="number"]:focus, input[type="text"]:focus {
 }
 .field-hint { font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-top: 2px; }
 
-/* ── Settings grid ──────────────────────────────────────────────────────────── */
+/*  Settings grid  */
 .settings-grid { display: flex; flex-direction: column; gap: 14px; }
 .settings-divider {
   border: none; border-top: 1px solid var(--border);
@@ -363,7 +357,7 @@ select:focus, input[type="number"]:focus, input[type="text"]:focus {
   margin-bottom: 10px;
 }
 
-/* ── Buttons ────────────────────────────────────────────────────────────────── */
+/* Buttons  */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   padding: 8px 14px;
@@ -396,7 +390,7 @@ select:focus, input[type="number"]:focus, input[type="text"]:focus {
 .btn-sm { font-size: 11.5px; padding: 5px 10px; gap: 4px; }
 .btn-sm svg { width: 13px; height: 13px; }
 
-/* ── Output section ─────────────────────────────────────────────────────────── */
+/*  Output section  */
 .output-wrap { margin-top: 1.25rem; }
 
 .stats-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
@@ -423,7 +417,7 @@ select:focus, input[type="number"]:focus, input[type="text"]:focus {
 }
 .output-empty svg { width: 36px; height: 36px; stroke: var(--text-muted); fill: none; stroke-width: 1.2; margin-bottom: 10px; }
 
-/* ── Tone badge ─────────────────────────────────────────────────────────────── */
+/*  Tone badge  */
 .tone-badge {
   display: inline-flex; align-items: center; gap: 4px;
   font-size: 11px; font-family: var(--font-mono); font-weight: 500;
@@ -439,14 +433,14 @@ select:focus, input[type="number"]:focus, input[type="text"]:focus {
 .tone-creative { background: #FBEAF0; color: #72243E; }
 [data-theme="dark"] .tone-creative { background: #2A1020; color: #E090B0; }
 
-/* ── Download bar ───────────────────────────────────────────────────────────── */
+/*  Download bar  */
 .download-bar {
   display: flex; flex-wrap: wrap; gap: 6px;
   padding-top: 14px; margin-top: 14px;
   border-top: 1px solid var(--border);
 }
 
-/* ── Alert ──────────────────────────────────────────────────────────────────── */
+/*  Alert  */
 .alert {
   padding: 10px 14px; border-radius: var(--radius-sm);
   font-size: 13px; line-height: 1.5;
@@ -458,7 +452,7 @@ select:focus, input[type="number"]:focus, input[type="text"]:focus {
 .alert-success { background: var(--accent-dim); color: var(--accent-text); }
 .alert-warn    { background: var(--amber-dim);  color: var(--amber-text); }
 
-/* ── Spinner & progress ─────────────────────────────────────────────────────── */
+/*  Spinner & progress  */
 .spinner {
   width: 18px; height: 18px; flex-shrink: 0;
   border: 2px solid rgba(255,255,255,0.25);
@@ -487,10 +481,10 @@ select:focus, input[type="number"]:focus, input[type="text"]:focus {
   font-size: 13px; color: var(--text-secondary);
 }
 
-/* ── Model note ─────────────────────────────────────────────────────────────── */
+/*  Model note  */
 .model-note { font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-top: 4px; }
 
-/* ── Page fade-in ───────────────────────────────────────────────────────────── */
+/*  Page fade-in  */
 .app-shell {
   animation: fadeUp 0.4s ease both;
 }
@@ -499,7 +493,7 @@ select:focus, input[type="number"]:focus, input[type="text"]:focus {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Scrollbar ──────────────────────────────────────────────────────────────── */
+/*  Scrollbar  */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
