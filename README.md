@@ -66,11 +66,5 @@ The JS will call HuggingFace directly from the frontend (requires CORS — works
 | Export | .txt · .md · .html · .pdf (print) · .docx · Copy to clipboard |
 | Themes | Light · Dark (system preference + manual toggle) |
 
-## Evaluation Criteria Coverage
-
-- **Functionality (30)** — Text + file input, AI summarization, length control, tone, output format
-- **UI/UX Design (15)** — Light/dark themes, responsive layout, progress indicator, word count live stats
-- **Code Quality (15)** — Modular file structure: HTML / CSS / JS / Python separated
-- **AI Integration (20)** — HuggingFace Inference API, 5 model choices, server-side proxy with preprocessing
-- **Innovation (10)** — Multi-format file parsing (LaTeX stripping, Markdown cleaning), tone detection, multi-format export
+export
 - **Documentation (10)** — This README + inline code comments
