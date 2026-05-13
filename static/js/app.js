@@ -3,7 +3,7 @@
  * Handles: theme, tab switching, file parsing, API calls, downloads
  */
 
-/* ── State ──────────────────────────────────────────────────────────────────── */
+/*  State  */
 const state = {
   activeTab: 'text',
   fileText: '',
@@ -12,7 +12,7 @@ const state = {
   isLoading: false,
 };
 
-/* ── Theme ──────────────────────────────────────────────────────────────────── */
+/*  Theme  */
 function initTheme() {
   const saved = localStorage.getItem('theme') ||
     (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -29,7 +29,7 @@ function toggleTheme() {
   applyTheme(current === 'dark' ? 'light' : 'dark');
 }
 
-/* ── Tab switching ──────────────────────────────────────────────────────────── */
+/*  Tab switching  */
 function switchTab(tab) {
   state.activeTab = tab;
   const paneText = document.getElementById('pane-text');
@@ -46,7 +46,7 @@ function switchTab(tab) {
   tabFile.setAttribute('aria-selected', tab === 'file');
 }
 
-/* ── Word / char / para counter ────────────────────────────────────────────── */
+/*  Word / char / para counter  */
 function countStats(text) {
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
   const chars = text.length;
@@ -62,7 +62,7 @@ function onTextInput() {
   document.getElementById('wc-paras').textContent = `${s.paras}¶`;
 }
 
-/* ── Condensation params ────────────────────────────────────────────────────── */
+/*  Condensation params  */
 function onCondenseByChange() {
   const val = document.getElementById('condense-by').value;
   ['ratio', 'words', 'chars', 'paragraphs'].forEach(k => {
@@ -79,7 +79,7 @@ function getCondenseValue() {
   return 30;
 }
 
-/* ── Model note ─────────────────────────────────────────────────────────────── */
+/*  Model note  */
 const MODEL_NOTES = {
   'facebook/bart-large-cnn':               'Best general-purpose. News, articles, reports.',
   'sshleifer/distilbart-cnn-12-6':         'Faster, lighter BART. Good for quick summaries.',
@@ -92,7 +92,7 @@ function onModelChange() {
   document.getElementById('model-note').textContent = MODEL_NOTES[v] || '';
 }
 
-/* ── Tone detection (client-side fallback) ──────────────────────────────────── */
+/*  Tone detection (client-side fallback)  */
 const TONE_KW = {
   academic:  ['therefore','hypothesis','methodology','findings','research','abstract','conclusion','study','analysis','literature','empirical'],
   technical: ['algorithm','function','parameter','implementation','interface','module','protocol','variable','configuration','deployment'],
@@ -109,7 +109,7 @@ function detectTone(text) {
   return Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
 }
 
-/* ── File handling ──────────────────────────────────────────────────────────── */
+/*  File handling  */
 function onFileSelect(evt) {
   const file = evt.target.files[0];
   if (file) loadFile(file);
@@ -205,7 +205,7 @@ function setFileText(text, name) {
   badge.querySelector('.badge-name').textContent = name;
 }
 
-/* ── Main summarize ─────────────────────────────────────────────────────────── */
+/*  Main summarize  */
 async function summarize() {
   if (state.isLoading) return;
 
@@ -265,7 +265,7 @@ async function summarize() {
   }
 }
 
-/* ── HuggingFace API call ───────────────────────────────────────────────────── */
+/*  HuggingFace API call  */
 async function callHuggingFace({ text, model, tone, outputFormat, condenseBy, condenseValue }) {
 
   const body = JSON.stringify({
@@ -331,7 +331,7 @@ function computeLocalStats(input, output) {
   return { input_words: iw, output_words: ow, input_chars: input.length, output_chars: output.length, ratio: Math.round(ow / Math.max(1, iw) * 100) };
 }
 
-/* ── Output rendering ───────────────────────────────────────────────────────── */
+/*  Output rendering  */
 function clearOutput() {
   document.getElementById('output-placeholder').style.display = 'none';
   document.getElementById('output-result').style.display     = 'none';
@@ -368,7 +368,7 @@ function setLoadingState(loading) {
   }
 }
 
-/* ── Alert ──────────────────────────────────────────────────────────────────── */
+/*  Alert  */
 function showAlert(msg, type = 'error') {
   const box = document.getElementById('alert-box');
   box.className = 'alert alert-' + type;
@@ -378,7 +378,7 @@ function showAlert(msg, type = 'error') {
   document.getElementById('output-placeholder').style.display = 'none';
 }
 
-/* ── Copy ───────────────────────────────────────────────────────────────────── */
+/*  Copy  */
 function copySummary() {
   if (!state.currentSummary) return;
   navigator.clipboard.writeText(state.currentSummary).then(() => {
@@ -387,7 +387,7 @@ function copySummary() {
   });
 }
 
-/* ── Download ───────────────────────────────────────────────────────────────── */
+/*  Download  */
 function downloadAs(fmt) {
   if (!state.currentSummary) return;
   const s = state.currentSummary;
@@ -463,7 +463,7 @@ function downloadDocx(text) {
   }
 }
 
-/* ── Init ───────────────────────────────────────────────────────────────────── */
+/*  Init  */
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
 
